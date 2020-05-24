@@ -22,6 +22,35 @@ rect {
     border: 5px solid #b1d4e7;
 }
 
+#modal_container {
+    text-align: center;
+}
+
+
+#battle_date,
+#battle_location,
+#battle_war,
+#battle_outcome {
+    text-align: left;
+}
+
+.modal-info {
+    text-align: center;
+    font-weight: 700!important;
+}
+
+.modal-link {
+  color: #9e988d;
+  &:hover {
+    color: #000000;
+  }
+}
+
+.inactive-link {
+    pointer-events: none;
+    cursor: default;
+}
+
 #cumulativeBtn,
 #centuriesBtn {
     margin: 5px;

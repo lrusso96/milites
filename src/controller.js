@@ -37,8 +37,31 @@ class Controller {
             self.brushedLineData = self.battles
             self.brushedMapData = self.battles
             self.wars = data[2]
+            self.allies = data[3]
+            self.commanders = data[4]
+            self.images = data[5]
             self.setupFilters()
             self.setupGraphs()
+
+
+            if(localStorage.getItem('theme') == 'dark') {
+              self.darkmode = true
+              self.applyDarkMode(0)
+
+              d3.select('#darkModeBtn')
+                .attr('src', './assets/light-theme.png')
+
+              d3.select('#blindsafeBtn')
+                .attr('src', './assets/light-eye-off.png')
+            }
+
+            if(localStorage.getItem('blindsafe') == 'on') {
+              self.blindsafe = true
+              self.applyDarkMode(0)
+
+              d3.select('#blindsafeBtn')
+                .attr('src', self.darkmode ? './assets/light-eye-on.png' : './assets/dark-eye-on.png')
+            }
         }).catch(function(error) {
             console.log(error);
             throw error;
@@ -56,7 +79,10 @@ class Controller {
         return Promise.all([
             d3.json('./assets/map.json'),
             d3.csv('./assets/battles.csv'),
-            d3.csv('./assets/wars.csv')
+            d3.csv('./assets/wars.csv'),
+            d3.csv('./assets/allies.csv'),
+            d3.csv('./assets/commanders.csv'),
+            d3.csv('./assets/images.csv')
         ])
     }
 
@@ -130,6 +156,7 @@ class Controller {
             d3.select(this).transition(t).attr('src', './assets/' + bg + '-eye-' + blind + '.png ')
 
             self.blindsafe = !self.blindsafe
+            localStorage.setItem('blindsafe', self.blindsafe ? 'on' : 'off')
             self.applyDarkMode()
         })
 
@@ -143,6 +170,7 @@ class Controller {
 
             // update self
             self.darkmode = !self.darkmode
+            localStorage.setItem('theme', self.darkmode ? 'dark' : 'light')
 
             self.applyDarkMode()
         })
@@ -186,7 +214,7 @@ class Controller {
     /**
      * Updates UI depending on dark mode boolean flag
      */
-    applyDarkMode() {
+    applyDarkMode(t=750) {
         mapChart.applyThemeChanged(this.darkmode, this.blindsafe);
         lineChart.applyThemeChanged(this.darkmode, this.blindsafe);
         stackedBarChart.applyThemeChanged(this.darkmode, this.blindsafe);
@@ -194,7 +222,7 @@ class Controller {
         scatterPlot.applyThemeChanged(this.darkmode, this.blindsafe);
 
         //General changes
-        var t = d3.transition().duration(750)
+        var t = d3.transition().duration(t)
 
         if (this.darkmode) {
             d3.selectAll('.svg-content-responsive')
@@ -256,7 +284,8 @@ class Controller {
                 .transition(t)
                 .style('border-top-color', '#bfbfbf');
 
-            d3.selectAll('i.fa')
+            d3.select('.social-list')
+              .selectAll('i.fa')
                 .on('mouseover', function() {
                     d3.select(this)
                         .style('color', '#ffffff');
@@ -267,6 +296,57 @@ class Controller {
                 })
                 .transition(t)
                 .style('color', '#d9d9d9');
+
+            //Update modal
+            d3.select('.modal-header')
+              .transition(t)
+              .style('background-color', '#4d4d4d')
+
+            d3.select('#modalLabel')
+                .transition(t)
+                .style('color', '#ffffff')
+
+            d3.select('.modal-btn')
+              .transition(t)
+              .style('color', '#ffffff')
+
+            d3.select('.modal-body')
+                .transition(t)
+                .style('background-color', '#4d4d4d')
+
+            d3.select('.modal-body')
+              .selectAll('hr')
+              .transition(t)
+              .style('background-color', '#dee2e6')
+
+            d3.selectAll('.modal-section')
+              .transition(t)
+              .style('color','#c2c2c2')
+
+            d3.selectAll('.modal-info')
+              .transition(t)
+              .style('color', '#ffffff')
+
+            d3.selectAll('.modal-data')
+              .transition(t)
+              .style('color', '#ffffff')
+
+
+            d3.selectAll('.modal-link')
+                .on('mouseover', function() {
+                    d3.select(this)
+                        .style('color', '#ffffff');
+                })
+                .on('mouseout', function() {
+                    d3.select(this)
+                        .style('color', '#d9d9d9');
+                })
+                .transition(t)
+                .style('color', '#d9d9d9');
+
+            d3.select('.modal-footer')
+                .transition(t)
+                .style('background-color', '#4d4d4d')
 
         } else {
             d3.selectAll('.svg-content-responsive')
@@ -324,7 +404,8 @@ class Controller {
                 .transition(t)
                 .style('border-top-color', '#595959');
 
-            d3.selectAll('i.fa')
+            d3.select('.social-list')
+              .selectAll('i.fa')
                 .on('mouseover', function() {
                     d3.select(this)
                         .style('color', '#000000');
@@ -335,6 +416,57 @@ class Controller {
                 })
                 .transition(t)
                 .style('color', '#808080');
+
+            //Update modal
+            d3.select('.modal-header')
+              .transition(t)
+              .style('background-color', '#ffffff')
+
+            d3.select('#modalLabel')
+              .transition(t)
+              .style('color', '#000000')
+
+            d3.select('.modal-btn')
+              .transition(t)
+              .style('color', '#000000')
+
+            d3.select('.modal-body')
+              .transition(t)
+              .style('background-color', '#ffffff')
+
+            d3.select('.modal-body')
+              .selectAll('hr')
+              .transition(t)
+              .style('background-color', '#dee2e6')
+
+            d3.selectAll('.modal-section')
+              .transition(t)
+              .style('color', '#6c757d')
+
+            d3.selectAll('.modal-info')
+              .transition(t)
+              .style('color', '#000000')
+
+            d3.selectAll('.modal-data')
+              .transition(t)
+              .style('color', '#000000')
+
+
+            d3.selectAll('.modal-link')
+                .on('mouseover', function() {
+                    d3.select(this)
+                      .style('color', '#000000');
+                })
+                .on('mouseout', function() {
+                    d3.select(this)
+                      .style('color', '#9e988d');
+                })
+                .transition(t)
+                .style('color', '#9e988d');
+
+            d3.select('.modal-footer')
+              .transition(t)
+              .style('background-color', '#ffffff')
         }
     }
 

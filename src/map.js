@@ -1,7 +1,7 @@
 import controller from './controller'
-import BorderedChart from './borderedChart';
+import BorderedChart from './borderedChart'
 
-const d3 = require('d3');
+const d3 = require('d3')
 
 var isBrushing = false,
     brushedArea = undefined
@@ -49,8 +49,7 @@ class Map extends BorderedChart {
     }
 
     notifyDataChanged(redraw = true) {
-        if (redraw) this.drawChart()
-        else this.update()
+        redraw ? this.drawChart() : this.update()
     }
 
     /**
@@ -74,57 +73,55 @@ class Map extends BorderedChart {
             .append('path')
             .attr('class', 'state')
             .attr('id', function(d) {
-                return d.properties['OBJECTID'];
+                return d.properties['OBJECTID']
             })
-            .attr('d', path);
+            .attr('d', path)
 
         markerGroup = this.chart.append('g')
             .attr('class', 'brush')
-            .call(this.brush);
+            .call(this.brush)
 
-        var self = this;
+        var self = this
         markerGroup.append('g')
             .selectAll('circle')
             .data(this.battles)
             .enter()
             .append('circle')
-            .attr('cx', function(d) {
-                return projection([d.longitude, d.latitude])[0];
-            })
-            .attr('cy', function(d) {
-                return projection([d.longitude, d.latitude])[1];
-            })
+            .attr('cx', d => projection([d.longitude, d.latitude])[0])
+            .attr('cy', d => projection([d.longitude, d.latitude])[1])
             .attr('class', function(d) {
-                if (d.outcome == 'W')
-                    return 'won';
-                else if (d.outcome == 'L')
-                    return 'lost';
-                else if (d.outcome == 'C')
-                    return 'civil';
-                else
-                    return 'uncertain';
+                switch (d.outcome) {
+                    case 'W':
+                        return 'won'
+                    case 'L':
+                        return 'lost'
+                    case 'C':
+                        return 'civil'
+                    default:
+                        return 'uncertain'
+                }
             })
             .attr('r', 4)
             .attr('fill', 'blue')
             .attr('pointer-events', 'visible')
             .on('click', function(d) {
                 d3.selectAll('.selected')
-                    .classed('selected', false);
+                    .classed('selected', false)
 
                 d3.select(this)
-                    .classed('selected', true);
+                    .classed('selected', true)
                 setLabel(self, d)
             })
-            .style('visibility', 'visible');
+            .attr('data-toggle', 'modal')
+            .attr('data-target', '#modal_container')
+            .style('visibility', 'visible')
 
         legend = this.setupLegend()
-
         this.applyThemeChanged(controller.darkmode, controller.blindsafe)
     }
 
     update() {
         var points = 0
-
         var self = this
         var minYear = Infinity,
             maxYear = -Infinity
@@ -140,9 +137,9 @@ class Map extends BorderedChart {
                         .style('visibility', 'visible')
                         .attr('stroke-width', 0.5)
                         .attr('stroke', 'white')
-                    setLabel(self, d);
+                    setLabel(self, d)
                 } else d3.select(this).style('visibility', 'hidden')
-            });
+            })
 
         updateLegend(points, minYear, maxYear)
     }
@@ -151,14 +148,14 @@ class Map extends BorderedChart {
         //reset previous scatter brush
         this.setScatterBattles()
         var self = this
-        var selection = d3.event.selection;
+        var selection = d3.event.selection
 
         var isClick = JSON.stringify(brushedArea) == JSON.stringify(selection)
         brushedArea = selection
 
-        var points = 0;
-        var minYear = Infinity;
-        var maxYear = -Infinity;
+        var points = 0
+        var minYear = Infinity
+        var maxYear = -Infinity
 
         var echo = []
         if (selection) {
@@ -166,36 +163,36 @@ class Map extends BorderedChart {
                 isBrushing = true
                 markerGroup.selectAll('circle')
                     .style('visibility', function(d) {
-                        var cx = d3.select(this).attr('cx');
-                        var cy = d3.select(this).attr('cy');
-                        //Check if the point is inside the brushed area
+                        var cx = d3.select(this).attr('cx')
+                        var cy = d3.select(this).attr('cy')
+                            //Check if the point is inside the brushed area
                         var isBrushed = (cx >= selection[0][0] && cx <= selection[1][0] &&
-                            cy >= selection[0][1] && cy <= selection[1][1]);
+                            cy >= selection[0][1] && cy <= selection[1][1])
 
                         if (isBrushed) {
                             echo.push(d)
-                            points++;
-                            minYear = d3.min([minYear, +d.year]);
-                            maxYear = d3.max([maxYear, +d.year]);
+                            points++
+                            minYear = d3.min([minYear, +d.year])
+                            maxYear = d3.max([maxYear, +d.year])
                             d3.select(this)
                                 .classed('brushed', true)
                                 .attr('stroke-width', 0.5)
-                                .attr('stroke', 'white');
+                                .attr('stroke', 'white')
 
-                            setLabel(self, d);
-                            return 'visible';
+                            setLabel(self, d)
+                            return 'visible'
                         }
-                        d3.select(this).attr('stroke-width', 0).classed('brushed', false);
-                        return 'hidden';
-                    });
+                        d3.select(this).attr('stroke-width', 0).classed('brushed', false)
+                        return 'hidden'
+                    })
                 updateLegend(points, minYear, maxYear)
                 controller.setBrushedMapData(echo)
             }
         } else {
             isBrushing = false
             markerGroup.selectAll('circle')
-                .style('visibility', "visible");
-            resetLegend();
+                .style('visibility', "visible")
+            resetLegend()
             controller.resetBrushedMapData()
         }
     }
@@ -205,7 +202,7 @@ class Map extends BorderedChart {
             .attr("width", 200)
             .attr("height", 120)
             .attr('x', 400)
-            .attr('y', 10);
+            .attr('y', 10)
 
         legend.append('text')
             .attr('id', 'battle_label')
@@ -213,207 +210,226 @@ class Map extends BorderedChart {
             .attr('x', 5)
             .attr('y', 20)
             .attr('font-size', 12)
-            .attr('font-weight', 'bold');
+            .attr('font-weight', 'bold')
 
         legend.append('text')
             .attr('id', 'battle_year')
             .attr('class', 'legend-label')
             .attr('x', 5)
             .attr('y', 40)
-            .attr('font-size', 10);
-
-        legend.append('text')
-            .attr('id', 'battle_coordinate')
-            .attr('class', 'legend-label')
-            .attr('x', 5)
-            .attr('y', 60)
-            .attr('font-size', 10);
-
-        legend.append('text')
-            .attr('id', 'battle_outcome')
-            .attr('class', 'legend-label')
-            .attr('x', 5)
-            .attr('y', 80)
-            .attr('font-size', 10);
-
-        legend.append('text')
-            .attr('id', 'battle_war')
-            .attr('class', 'legend-label')
-            .attr('x', 5)
-            .attr('y', 100)
             .attr('font-size', 10)
-        this.setupInfoButton(legend)
-        return legend;
-    }
 
-    setupInfoButton(legend) {
-        legend.append('circle')
-            .attr('id', 'war-info-btn')
-            .style("stroke", "black")
-            .style("fill", "gray")
-            .attr("r", 6)
-            .attr("cx", 10)
-            .attr("cy", 112)
-
-        legend.append('text')
-            .attr('id', 'war-info-label')
-            .attr("fill", "white")
-            .attr('x', 9)
-            .text("i")
-            .attr('y', 115)
-            .attr('font-size', 10)
+        return legend
     }
 
     applyThemeChanged(darkmode, blindsafe) {
         if (darkmode && !blindsafe) {
             //Update battles on map
             markerGroup.selectAll('circle.won')
-                .style('fill', '#1b9e77');
+                .style('fill', '#1b9e77')
 
             markerGroup.selectAll('circle.lost')
-                .style('fill', '#d95f02');
+                .style('fill', '#d95f02')
 
             markerGroup.selectAll('circle.civil')
-                .style('fill', '#7570b3');
+                .style('fill', '#7570b3')
 
             markerGroup.selectAll('circle.uncertain')
-                .style('fill', '#e7298a');
+                .style('fill', '#e7298a')
 
             //Update map's paths, svg and legend
             this.chart.selectAll('path.state')
                 .style('fill', '#255874')
-                .style('stroke', '#737373');
+                .style('stroke', '#737373')
 
             legend.selectAll('text.legend-label')
-                .style('fill', '#cccccc');
+                .style('fill', '#cccccc')
 
         } else if ((!darkmode && blindsafe) || (darkmode && blindsafe)) {
             //Update battles on map
             markerGroup.selectAll('circle.won')
-                .style('fill', '#33a02c');
+                .style('fill', '#33a02c')
 
             markerGroup.selectAll('circle.lost')
-                .style('fill', '#1f78b4');
+                .style('fill', '#1f78b4')
 
             markerGroup.selectAll('circle.civil')
-                .style('fill', '#b2df8a');
+                .style('fill', '#b2df8a')
 
             markerGroup.selectAll('circle.uncertain')
-                .style('fill', '#a6cee3');
+                .style('fill', '#a6cee3')
 
             if (!darkmode) {
                 //Update map's paths, svg and legend
                 this.chart.selectAll('path.state')
                     .style('fill', '#b1d4e7')
-                    .style('stroke', '#b3b3b3');
+                    .style('stroke', '#b3b3b3')
 
                 legend.selectAll('text.legend-label')
-                    .style('fill', '#808080');
+                    .style('fill', '#808080')
             } else {
                 //Update map's paths, svg and legend
                 this.chart.selectAll('path.state')
                     .style('fill', '#255874')
-                    .style('stroke', '#737373');
+                    .style('stroke', '#737373')
 
                 legend.selectAll('text.legend-label')
-                    .style('fill', '#cccccc');
+                    .style('fill', '#cccccc')
             }
         } else {
             //!darkmode && !blindsafe
 
             //Update battles on map
             markerGroup.selectAll('circle.won')
-                .style('fill', '#8dd3c7');
+                .style('fill', '#8dd3c7')
 
             markerGroup.selectAll('circle.lost')
-                .style('fill', '#fb8072');
+                .style('fill', '#fb8072')
 
             markerGroup.selectAll('circle.civil')
-                .style('fill', '#ffffb3');
+                .style('fill', '#ffffb3')
 
             markerGroup.selectAll('circle.uncertain')
-                .style('fill', '#bebada');
+                .style('fill', '#bebada')
 
             //Update map's paths, svg and legend
             this.chart.selectAll('path.state')
                 .style('fill', '#b1d4e7')
-                .style('stroke', '#b3b3b3');
+                .style('stroke', '#b3b3b3')
 
             legend.selectAll('text.legend-label')
-                .style('fill', '#808080');
+                .style('fill', '#808080')
         }
     }
 }
 
 function updateLegend(numBattles, min, max) {
-    if (numBattles == 1) {
-        legend.select('#war-info-btn')
-            .style('visibility', 'visible')
-        legend.select('#war-info-label')
-            .style('visibility', 'visible')
-        return;
-    }
-
     resetLegend()
-    if (numBattles != 0) {
-        legend.select('#battle_label')
-            .text(numBattles + " battles selected");
-        legend.select('#battle_year')
-            .text('From ' + parseRoman(Math.trunc(min)) + ' to ' + parseRoman(Math.trunc(max)));
-        legend.select('#battle_war')
-            .text('')
+    switch (numBattles) {
+        case 0:
+            break
+        case 1:
+            legend.select('#battle_label')
+                .text(numBattles + " battle selected")
+            break
+        default:
+            legend.select('#battle_label')
+                .text(numBattles + " battles selected")
+            legend.select('#battle_year')
+                .text('From ' + parseRoman(Math.trunc(min)) + ' to ' + parseRoman(Math.trunc(max)))
+            break
     }
 }
 
 function parseRoman(y) {
-    if (y == 0) return 0;
-    if (y < 0) return -y + "BC";
+    if (y == 0) return 0
+    if (y < 0) return -y + "BC"
     return y + "AD"
 }
 
 function setLabel(self, d) {
-    legend.select('#battle_label')
-        .text(d.label);
-    legend.select('#battle_year')
-        .text('Year: ' + parseRoman(d.year));
-    legend.select('#battle_coordinate')
-        .text('Coordinates: (' + d.latitude + ',' + d.longitude + ')');
-    legend.select('#battle_outcome')
-        .text('Outcome: ' + d.outcome);
-
     var war = self.wars.filter(x => d.warId === x.id)
+    var commanders = controller.commanders.filter(x => d.id === x.id)
+    var allies = controller.allies.filter(x => d.id === x.id)
+    var image = controller.images.filter(x => d.id === x.id)[0].img
+    var modal_container = d3.select('#modal_container')
 
-    legend.select('#battle_war')
+    modal_container.select('#modalImg').attr('src', image == "" ? './assets/placeholder.png' : image)
+
+
+    modal_container.select('.modal-title')
+        .text(d.label)
+
+    modal_container.select('#battle_date')
+        .text(parseRoman(d.year))
+
+    modal_container.select('#battle_location')
+        .text(d.locationLabel)
+        .attr('href', 'https://pleiades.stoa.org/places/' + d.stoaId)
+        .classed('inactive-link', () => d.stoaId == '-')
+
+    modal_container.select('#battle_war')
+        .text("-")
+
+    modal_container.select('#battle_outcome')
+        .text(d.outcome)
+
+    modal_container.select('#romanCommanders')
         .text(function() {
-            return 'War: ' + (war.length == 0 || war == null ? '-' : war[0].label);
+            if (commanders[0].RomanCommanders == "")
+                return "-"
+            return commanders[0].RomanCommanders
         })
 
+    modal_container.select('#enemyCommanders')
+        .text(function() {
+            if (commanders[0].EnemyCommanders == "")
+                return "-"
+            return commanders[0].EnemyCommanders
+        })
+
+    modal_container.select('#romanAllies')
+        .text(function() {
+            if (allies[0].RomanAllies == "")
+                return "-"
+            return allies[0].RomanAllies
+        })
+
+    modal_container.select('#enemyAllies')
+        .text(function() {
+            if (allies[0].EnemyAllies == "")
+                return "-"
+            return allies[0].EnemyAllies
+        })
+
+    modal_container.select('#romanStrength')
+        .text(function() {
+            if (allies[0].RomanStrength == "")
+                return "-"
+            return allies[0].RomanStrength
+        })
+
+    modal_container.select('#romanLosses')
+        .text(function() {
+            if (allies[0].RomanLosses == "")
+                return "-"
+            return allies[0].RomanLosses
+
+        })
+
+    modal_container.select('#enemyStrength')
+        .text(function() {
+            if (allies[0].EnemyStrength == "")
+                return "-"
+            return allies[0].EnemyStrength
+        })
+
+    modal_container.select('#enemyLosses')
+        .text(function() {
+            if (allies[0].EnemyLosses == "")
+                return "-"
+            return allies[0].EnemyLosses
+        })
+
+    var modalOnClick = function() {}
     if (war != null && war.length > 0 && war[0].wikidata != '') {
-        legend.select('#war-info-btn')
-            .style('visibility', 'visible')
-            .on('click', function() {
-                window.open("https://www.wikidata.org/wiki/" + war[0].wikidata)
-            })
-        legend.select('#war-info-label')
-            .style('visibility', 'visible')
+        modal_container.select('#battle_war')
+            .text(war[0].label)
+
+        modalOnClick = function() {
+            window.open("https://www.wikidata.org/wiki/" + war[0].wikidata)
+        }
     }
+
+    modal_container.select('#explore-btn')
+        .on('click', modalOnClick)
 }
 
 function resetLegend() {
     legend.select('#battle_label')
-        .text('');
-    legend.select('#battle_year')
-        .text('');
-    legend.select('#battle_coordinate')
-        .text('');
-    legend.select('#battle_outcome')
-        .text('');
-    legend.select('#battle_war')
         .text('')
-    legend.select('#war-info-btn')
-        .style('visibility', 'hidden')
-    legend.select('#war-info-label')
-        .style('visibility', 'hidden')
+    legend.select('#battle_year')
+        .text('')
 }
 
 export default new Map()
