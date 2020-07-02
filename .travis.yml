@@ -1,0 +1,8 @@
+language: node_js
+
+script: npm run build
+
+after_success: |
+    sudo pip install ghp-import && \
+    ghp-import dist && \
+    git push -qf https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
