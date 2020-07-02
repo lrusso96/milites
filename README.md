@@ -1,6 +1,6 @@
 # milites
 
-[![made-with-d3](https://img.shields.io/badge/Made%20with-D3-ec8448.svg)](https://d3js.org/)
+[![Build Status](https://travis-ci.com/lrusso96/milites.svg?branch=master)](https://travis-ci.com/lrusso96/milites)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 This is a project for Visual Analytics course held by professor G. Santucci.
