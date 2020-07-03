@@ -14,22 +14,22 @@ const config = {
     },
     module: {
         rules: [{
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader'
-                }
-            },
-            {
-                test: /\.(sa|sc|c)ss$/,
-                use: [
-                    'style-loader',
-                    MiniCssExtractPlugin.loader,
-                    'css-loader',
-                    'postcss-loader',
-                    'sass-loader'
-                ]
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: {
+                loader: 'babel-loader'
             }
+        },
+        {
+            test: /\.(sa|sc|c)ss$/,
+            use: [
+                'style-loader',
+                MiniCssExtractPlugin.loader,
+                'css-loader',
+                'postcss-loader',
+                'sass-loader'
+            ]
+        }
         ]
     },
     plugins: [
@@ -43,21 +43,23 @@ const config = {
             hash: true,
             alwaysWriteToDisk: true
         }),
-        new CopyWebpackPlugin([
-            { from: './src/assets/map.json', to: './assets' },
-            { from: './src/assets/battles.csv', to: './assets' },
-            { from: './src/assets/wars.csv', to: './assets' },
-            { from: './src/assets/allies.csv', to: './assets' },
-            { from: './src/assets/commanders.csv', to: './assets' },
-            { from: './src/assets/images.csv', to: './assets' },
-            { from: './src/assets/dark-eye-off.png', to: './assets' },
-            { from: './src/assets/light-eye-off.png', to: './assets' },
-            { from: './src/assets/dark-eye-on.png', to: './assets' },
-            { from: './src/assets/light-eye-on.png', to: './assets' },
-            { from: './src/assets/dark-theme.png', to: './assets' },
-            { from: './src/assets/light-theme.png', to: './assets' },
-            { from: './src/assets/placeholder.png', to: './assets' }
-        ])
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: './src/assets/map.json', to: './assets' },
+                { from: './src/assets/battles.csv', to: './assets' },
+                { from: './src/assets/wars.csv', to: './assets' },
+                { from: './src/assets/allies.csv', to: './assets' },
+                { from: './src/assets/commanders.csv', to: './assets' },
+                { from: './src/assets/images.csv', to: './assets' },
+                { from: './src/assets/dark-eye-off.png', to: './assets' },
+                { from: './src/assets/light-eye-off.png', to: './assets' },
+                { from: './src/assets/dark-eye-on.png', to: './assets' },
+                { from: './src/assets/light-eye-on.png', to: './assets' },
+                { from: './src/assets/dark-theme.png', to: './assets' },
+                { from: './src/assets/light-theme.png', to: './assets' },
+                { from: './src/assets/placeholder.png', to: './assets' }
+            ]
+        })
     ]
 }
 
